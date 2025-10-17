@@ -1,0 +1,107 @@
+app:
+  name: "Enterprise AI Gateway"
+  version: "0.1.0"
+  debug: true
+  environment: "development"
+  log_level: "DEBUG"
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 1
+  reload: true
+  access_log: true
+  cors:
+    origins: 
+      - "http://localhost:3000"
+      - "http://localhost:8080"
+    allow_credentials: true
+
+database:
+  url: "sqlite:///./data/dev.db"
+  pool_size: 5
+  max_overflow: 10
+  echo: true
+
+redis:
+  url: "redis://localhost:6379/0"
+  password: null
+  db: 0
+  max_connections: 10
+  cache_ttl: 3600
+
+vector_db:
+  provider: "weaviate"
+  url: "http://localhost:8080"
+  api_key: null
+  class_name: "Documents"
+  embedding:
+    model: "sentence-transformers/all-MiniLM-L6-v2"
+    batch_size: 32
+
+llm:
+  default_provider: "ollama"
+  default_model: "llama3"
+  providers:
+    ollama:
+      base_url: "http://localhost:11434"
+      timeout: 60
+    openai:
+      api_key: "${OPENAI_API_KEY}"
+      model: "gpt-3.5-turbo"
+      timeout: 30
+    anthropic:
+      api_key: "${ANTHROPIC_API_KEY}"
+      model: "claude-3-sonnet-20240229"
+      timeout: 30
+
+security:
+  api_keys:
+    enabled: true
+    secret: "${API_KEY_SECRET}"
+  jwt:
+    secret_key: "${JWT_SECRET_KEY}"
+    algorithm: "HS256"
+    access_token_expire_minutes: 30
+  encryption:
+    key: "${ENCRYPTION_KEY}"
+  pii_protection:
+    enabled: true
+    threshold: 0.8
+    analyzer_url: "http://localhost:5001"
+    anonymizer_url: "http://localhost:5002"
+
+plugins:
+  directory: "./plugins"
+  timeout: 30
+  max_retries: 3
+  enabled:
+    - "sql_database_agent"
+    - "financial_api_agent"
+
+monitoring:
+  metrics:
+    enabled: true
+    prometheus_port: 9090
+  logging:
+    audit_enabled: true
+    audit_log_path: "./logs/audit.log"
+    structured: true
+  tracing:
+    enabled: true
+    service_name: "enterprise-ai-gateway"
+
+rate_limiting:
+  per_minute: 60
+  burst: 100
+  enabled: true
+
+file_processing:
+  max_file_size_mb: 50
+  supported_types:
+    - "pdf"
+    - "docx"
+    - "txt"
+    - "html"
+    - "md"
+  batch_size: 5

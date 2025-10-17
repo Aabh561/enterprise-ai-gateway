@@ -1,0 +1,74 @@
+# FastAPI and ASGI server
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+gunicorn==21.2.0
+
+# Data validation and settings
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# LLM Integration
+langchain==0.0.335
+langchain-community==0.0.10
+ollama==0.1.7
+openai==1.3.5
+anthropic==0.7.8
+
+# Vector Database and Embeddings
+weaviate-client==3.25.3
+sentence-transformers==2.2.2
+unstructured[all-docs]==0.11.8
+pypdf==3.17.4
+
+# Security and PII Protection
+presidio-analyzer==2.2.33
+presidio-anonymizer==2.2.33
+cryptography==41.0.7
+
+# Caching and Database
+redis==5.0.1
+aioredis==2.0.1
+sqlalchemy==2.0.23
+alembic==1.13.1
+asyncpg==0.29.0
+psycopg2-binary==2.9.9
+
+# HTTP Client
+httpx==0.25.2
+aiohttp==3.9.1
+
+# Configuration and Environment
+python-multipart==0.0.6
+python-dotenv==1.0.0
+pyyaml==6.0.1
+
+# Monitoring and Observability  
+prometheus-client==0.19.0
+structlog==23.2.0
+loguru==0.7.2
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+httpx==0.25.2
+factory-boy==3.3.0
+
+# Development Tools
+black==23.11.0
+isort==5.12.0
+flake8==6.1.0
+mypy==1.7.1
+pre-commit==3.6.0
+
+# Async and concurrency
+asyncio-mqtt==0.16.1
+celery==5.3.4
+
+# API Documentation
+mkdocs==1.5.3
+mkdocs-material==9.4.10
+
+# Financial API (for plugin example)
+yfinance==0.2.28
+alpha-vantage==2.3.1

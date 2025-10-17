@@ -1,0 +1,143 @@
+app:
+  name: "Enterprise AI Gateway"
+  version: "0.1.0"
+  debug: false
+  environment: "production"
+  log_level: "INFO"
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  reload: false
+  access_log: false
+  cors:
+    origins: 
+      - "${ALLOWED_ORIGIN_1}"
+      - "${ALLOWED_ORIGIN_2}"
+    allow_credentials: true
+
+database:
+  url: "${DATABASE_URL}"
+  pool_size: 20
+  max_overflow: 30
+  echo: false
+  ssl_mode: "require"
+
+redis:
+  url: "${REDIS_URL}"
+  password: "${REDIS_PASSWORD}"
+  db: 0
+  max_connections: 50
+  cache_ttl: 7200
+  ssl: true
+
+vector_db:
+  provider: "weaviate"
+  url: "${WEAVIATE_URL}"
+  api_key: "${WEAVIATE_API_KEY}"
+  class_name: "Documents"
+  embedding:
+    model: "sentence-transformers/all-mpnet-base-v2"
+    batch_size: 64
+
+llm:
+  default_provider: "openai"
+  default_model: "gpt-4-turbo-preview"
+  providers:
+    openai:
+      api_key: "${OPENAI_API_KEY}"
+      model: "gpt-4-turbo-preview"
+      timeout: 60
+      max_retries: 3
+    anthropic:
+      api_key: "${ANTHROPIC_API_KEY}"
+      model: "claude-3-opus-20240229"
+      timeout: 60
+      max_retries: 3
+    ollama:
+      base_url: "${OLLAMA_BASE_URL}"
+      timeout: 120
+
+security:
+  api_keys:
+    enabled: true
+    secret: "${API_KEY_SECRET}"
+    require_https: true
+  jwt:
+    secret_key: "${JWT_SECRET_KEY}"
+    algorithm: "HS256"
+    access_token_expire_minutes: 15
+  encryption:
+    key: "${ENCRYPTION_KEY}"
+  pii_protection:
+    enabled: true
+    threshold: 0.9
+    analyzer_url: "${PRESIDIO_ANALYZE_ENDPOINT}"
+    anonymizer_url: "${PRESIDIO_ANONYMIZE_ENDPOINT}"
+  content_filtering:
+    enabled: true
+    max_input_length: 8192
+    blocked_patterns:
+      - "malicious_pattern_1"
+      - "malicious_pattern_2"
+
+plugins:
+  directory: "./plugins"
+  timeout: 60
+  max_retries: 2
+  enabled:
+    - "sql_database_agent"
+    - "financial_api_agent"
+  sandbox:
+    enabled: true
+    memory_limit_mb: 512
+    cpu_limit_percent: 50
+
+monitoring:
+  metrics:
+    enabled: true
+    prometheus_port: 9090
+    include_sensitive_labels: false
+  logging:
+    audit_enabled: true
+    audit_log_path: "${AUDIT_LOG_PATH}"
+    structured: true
+    retention_days: 90
+  tracing:
+    enabled: true
+    service_name: "enterprise-ai-gateway"
+    sample_rate: 0.1
+  alerts:
+    enabled: true
+    webhook_url: "${ALERT_WEBHOOK_URL}"
+
+rate_limiting:
+  per_minute: 100
+  burst: 200
+  enabled: true
+  redis_prefix: "rate_limit:"
+
+file_processing:
+  max_file_size_mb: 100
+  supported_types:
+    - "pdf"
+    - "docx"
+    - "txt"
+    - "html"
+    - "md"
+    - "csv"
+    - "json"
+  batch_size: 20
+  virus_scanning:
+    enabled: true
+    endpoint: "${VIRUS_SCAN_ENDPOINT}"
+
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention_days: 30
+  storage:
+    type: "s3"
+    bucket: "${BACKUP_S3_BUCKET}"
+    prefix: "enterprise-ai-gateway/"
