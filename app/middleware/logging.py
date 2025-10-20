@@ -57,7 +57,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             url=str(request.url),
             client_ip=client_ip,
             user_agent=user_agent,
-            headers=dict(request.headers) if logger.isEnabledFor("DEBUG") else None
+            headers=None
         )
         
         try:

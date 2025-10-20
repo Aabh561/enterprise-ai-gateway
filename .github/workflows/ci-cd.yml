@@ -9,7 +9,7 @@ on:
 env:
   PYTHON_VERSION: '3.11'
   DOCKER_REGISTRY: ghcr.io
-  IMAGE_NAME: enterprise-ai/enterprise-ai-gateway
+  IMAGE_NAME: ${{ toLower(github.repository) }}
 
 jobs:
   test:
@@ -77,7 +77,7 @@ jobs:
         REDIS_URL: redis://localhost:6379/0
         ENVIRONMENT: test
       run: |
-        pytest tests/ -v --cov=app --cov=services --cov-report=xml --cov-report=html
+        pytest tests/ -v --cov=app --cov=services --cov-report=xml --cov-report=html --cov-fail-under=80
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
@@ -108,10 +108,30 @@ jobs:
       with:
         sarif_file: 'trivy-results.sarif'
 
+  sast:
+    name: SAST and dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install tooling
+        run: |
+          python -m pip install --upgrade pip
+          pip install bandit pip-audit
+      - name: Run Bandit (fail on HIGH/CRITICAL)
+        run: bandit -r app services -lll -iii
+      - name: Run pip-audit with severity gate
+        run: |
+          python3 scripts/pip_audit_gate.py -r requirements.txt --fail-on-high
+
   build:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
-    needs: [test, security]
+    needs: [test, security, sast]
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     
     steps:
@@ -150,6 +170,13 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
+    - name: Set up Helm
+      uses: azure/setup-helm@v4
+
+    - name: Helm lint
+      run: |
+        helm lint deploy/helm/enterprise-ai-gateway
+
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
@@ -167,18 +194,19 @@ jobs:
         method: kubeconfig
         kubeconfig: ${{ secrets.KUBE_CONFIG_STAGING }}
 
-    - name: Deploy to staging
+    - name: Deploy to staging (Helm)
       run: |
-        kubectl apply -f infrastructure/k8s/staging/
-        kubectl set image deployment/enterprise-ai-gateway \
-          app=${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:develop-${{ github.sha }}
-        kubectl rollout status deployment/enterprise-ai-gateway
+        helm upgrade --install enterprise-ai-gateway deploy/helm/enterprise-ai-gateway \
+          --namespace enterprise-ai-gateway --create-namespace \
+          --set image.repository=${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }},image.tag=develop-${{ github.sha }}
+        kubectl rollout status deployment/enterprise-ai-gateway -n enterprise-ai-gateway
 
     - name: Run smoke tests
+      env:
+        APP_BASE_URL: "http://enterprise-ai-gateway.enterprise-ai-gateway.svc.cluster.local:8000"
       run: |
         sleep 30  # Wait for deployment
-        # Add smoke test commands here
-        echo "Running smoke tests..."
+        python3 scripts/smoke_test.py
 
   deploy-production:
     name: Deploy to Production
@@ -197,18 +225,19 @@ jobs:
         method: kubeconfig
         kubeconfig: ${{ secrets.KUBE_CONFIG_PRODUCTION }}
 
-    - name: Deploy to production
+    - name: Deploy to production (Helm)
       run: |
-        kubectl apply -f infrastructure/k8s/production/
-        kubectl set image deployment/enterprise-ai-gateway \
-          app=${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:main-${{ github.sha }}
-        kubectl rollout status deployment/enterprise-ai-gateway
+        helm upgrade --install enterprise-ai-gateway deploy/helm/enterprise-ai-gateway \
+          --namespace enterprise-ai-gateway --create-namespace \
+          --set image.repository=${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }},image.tag=main-${{ github.sha }}
+        kubectl rollout status deployment/enterprise-ai-gateway -n enterprise-ai-gateway
 
-    - name: Run health checks
+    - name: Run production smoke tests
+      env:
+        APP_BASE_URL: "http://enterprise-ai-gateway.enterprise-ai-gateway.svc.cluster.local:8000"
       run: |
         sleep 60  # Wait for deployment
-        # Add health check commands here
-        echo "Running production health checks..."
+        python3 scripts/smoke_test.py
 
   notify:
     name: Notification

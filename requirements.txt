@@ -17,7 +17,6 @@ anthropic==0.7.8
 # Vector Database and Embeddings
 weaviate-client==3.25.3
 sentence-transformers==2.2.2
-unstructured[all-docs]==0.11.8
 pypdf==3.17.4
 
 # Security and PII Protection

@@ -1,0 +1,24 @@
+site_name: Enterprise AI Gateway
+site_description: The Central Nervous System for Enterprise AI
+site_url: https://example.com
+repo_url: https://github.com/enterprise-ai/enterprise-ai-gateway
+repo_name: enterprise-ai/enterprise-ai-gateway
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.sections
+    - search.highlight
+    - content.code.copy
+nav:
+  - Overview: docs/index.md
+  - API:
+      - API Overview: docs/api.md
+      - OpenAPI Schema: docs/openapi.json
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true
+plugins:
+  - search

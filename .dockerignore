@@ -1,0 +1,39 @@
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python packaging
+build/
+dist/
+.eggs/
+*.egg-info/
+
+# Virtual envs
+.venv/
+venv/
+
+# IDE/editor
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs and data
+logs/
+data/
+coverage/
+htmlcov/
+
+# Pytest
+.pytest_cache/
+
+# Docker
+**/.dockerignore
+**/Dockerfile*
+
+# Git
+.git/
+.gitignore

@@ -10,8 +10,8 @@ from functools import lru_cache
 from typing import List, Optional, Dict, Any
 
 import yaml
-from pydantic import BaseSettings, Field
-from pydantic_settings import SettingsConfigDict
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class CorsSettings(BaseSettings):
@@ -90,7 +90,9 @@ class LLMSettings(BaseSettings):
 class APIKeySettings(BaseSettings):
     """API key security settings."""
     enabled: bool = True
+    # Backward-compatible single secret; prefer 'secrets' list for rotation
     secret: str = "your-super-secret-api-key-here"
+    secrets: List[str] = Field(default_factory=list)
     require_https: bool = False
 
 
@@ -263,26 +265,29 @@ def get_settings() -> Settings:
     """
     Get application settings with caching.
     
-    This function loads settings based on the environment:
-    1. First checks for environment-specific YAML file (e.g., configs/dev.yaml)
-    2. Falls back to environment variables and .env file
-    3. Uses default values as last resort
-    
-    Returns:
-        Settings: Cached application settings instance
+    Load order:
+    1. CONFIG_PATH environment variable (absolute or relative path)
+    2. ENVIRONMENT-specific YAML (configs/<environment>.yaml)
+    3. Environment variables/.env defaults
     """
+    # 1) Explicit config path
+    explicit_path = os.getenv("CONFIG_PATH")
+    if explicit_path and os.path.exists(explicit_path):
+        try:
+            return Settings.load_from_yaml(explicit_path)
+        except Exception as e:
+            print(f"Warning: Failed to load CONFIG_PATH={explicit_path}: {e}")
+    
+    # 2) Environment-based YAML
     environment = os.getenv("ENVIRONMENT", "development")
-    
-    # Try to load from environment-specific YAML file
     yaml_path = f"configs/{environment}.yaml"
-    
     if os.path.exists(yaml_path):
         try:
             return Settings.load_from_yaml(yaml_path)
         except Exception as e:
             print(f"Warning: Failed to load {yaml_path}: {e}")
     
-    # Fall back to environment variables and defaults
+    # 3) Fall back to env vars and defaults
     return Settings()
 
 

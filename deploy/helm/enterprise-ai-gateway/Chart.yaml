@@ -1,0 +1,14 @@
+apiVersion: v2
+name: enterprise-ai-gateway
+version: 0.1.0
+appVersion: "0.1.0"
+description: Helm chart for Enterprise AI Gateway
+keywords:
+  - fastapi
+  - llm
+  - gateway
+  - ai
+home: https://github.com/enterprise-ai/enterprise-ai-gateway
+maintainers:
+  - name: Enterprise AI Team
+    email: team@enterprise-ai.com

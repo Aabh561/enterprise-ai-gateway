@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: enterprise-ai-gateway-config
+  namespace: enterprise-ai-gateway
+  labels:
+    app: enterprise-ai-gateway
+    component: config
+data:
+  app-config.yaml: |
+    app:
+      name: "Enterprise AI Gateway"
+      version: "1.0.0"
+      environment: "production"
+      log_level: "INFO"
+      debug: false
+      
+    server:
+      host: "0.0.0.0"
+      port: 8000
+      workers: 4
+      timeout: 300
+      max_connections: 1000
+      
+    database:
+      url: "postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/enterprise_ai_gateway"
+      pool_size: 20
+      max_overflow: 30
+      pool_timeout: 30
+      
+    redis:
+      url: "redis://redis:6379/0"
+      max_connections: 100
+      retry_on_timeout: true
+      health_check_interval: 30
+      
+    weaviate:
+      url: "http://weaviate:8080"
+      timeout: 60
+      retries: 3
+      
+    security:
+      jwt_secret_key: "${JWT_SECRET_KEY}"
+      jwt_algorithm: "HS256"
+      jwt_expire_minutes: 1440
+      cors_origins: ["*"]
+      rate_limit_per_minute: 100
+      
+    llm_providers:
+      openai:
+        api_key: "${OPENAI_API_KEY}"
+        base_url: "https://api.openai.com/v1"
+        timeout: 120
+        max_retries: 3
+        
+      anthropic:
+        api_key: "${ANTHROPIC_API_KEY}"
+        base_url: "https://api.anthropic.com"
+        timeout: 120
+        max_retries: 3
+        
+      ollama:
+        base_url: "http://ollama:11434"
+        timeout: 300
+        max_retries: 2
+        
+    monitoring:
+      prometheus:
+        enabled: true
+        port: 9090
+        path: "/metrics"
+        
+      jaeger:
+        enabled: true
+        agent_host: "jaeger"
+        agent_port: 6831
+        
+      logging:
+        level: "INFO"
+        format: "json"
+        output: "stdout"
+        
+    plugins:
+      enabled: true
+      sandbox_timeout: 30
+      max_memory_mb: 512
+      allowed_imports: ["json", "re", "datetime", "uuid", "hashlib"]

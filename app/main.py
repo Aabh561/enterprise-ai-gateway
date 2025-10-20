@@ -26,8 +26,6 @@ from app.middleware.logging import LoggingMiddleware
 from app.middleware.security import SecurityMiddleware
 from app.routers import v1
 from app.dependencies import get_current_user
-from services.chat_service import ChatService
-from services.caching_service import CachingService
 
 # Configure structured logging
 structlog.configure(
@@ -80,26 +78,9 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("Starting Enterprise AI Gateway", version=settings.app.version)
     
-    # Initialize services
-    try:
-        # Initialize cache service
-        cache_service = CachingService()
-        await cache_service.initialize()
-        app.state.cache_service = cache_service
-        
-        # Initialize chat service
-        chat_service = ChatService()
-        await chat_service.initialize()
-        app.state.chat_service = chat_service
-        
-        logger.info("All services initialized successfully")
-        
-        # Health check
-        app.state.startup_time = time.time()
-        
-    except Exception as e:
-        logger.error("Failed to initialize services", error=str(e))
-        raise
+    # Initialize core application state
+    app.state.startup_time = time.time()
+    logger.info("Enterprise AI Gateway started successfully")
     
     yield
     

@@ -77,6 +77,11 @@ class SecurityMiddleware(BaseHTTPMiddleware):
             
             # Add security headers to response
             self._add_security_headers(response)
+
+            # Add rate limit headers if available
+            if hasattr(request.state, "rate_limit_limit"):
+                response.headers["X-RateLimit-Limit"] = str(request.state.rate_limit_limit)
+                response.headers["X-RateLimit-Remaining"] = str(request.state.rate_limit_remaining)
             
             return response
             
@@ -140,27 +145,33 @@ class SecurityMiddleware(BaseHTTPMiddleware):
             return
         
         client_ip = self._get_client_ip(request)
+        api_key = request.headers.get("X-API-Key") or request.headers.get("Authorization") or "anonymous"
+        if api_key.startswith("Bearer "):
+            api_key = api_key[7:]
         current_time = time.time()
         window = 60  # 1 minute window
         
         # Clean old entries
         cutoff_time = current_time - window
         self.rate_limit_store = {
-            ip: timestamps for ip, timestamps in self.rate_limit_store.items()
+            key: timestamps for key, timestamps in self.rate_limit_store.items()
             if any(ts > cutoff_time for ts in timestamps)
         }
         
-        # Get or create entry for this IP
-        if client_ip not in self.rate_limit_store:
-            self.rate_limit_store[client_ip] = []
+        # Compose key combining API key and IP for fairness across keys
+        bucket_key = f"{api_key}:{client_ip}"
+        
+        # Get or create entry for this bucket
+        if bucket_key not in self.rate_limit_store:
+            self.rate_limit_store[bucket_key] = []
         
         # Filter to current window
-        self.rate_limit_store[client_ip] = [
-            ts for ts in self.rate_limit_store[client_ip] if ts > cutoff_time
+        self.rate_limit_store[bucket_key] = [
+            ts for ts in self.rate_limit_store[bucket_key] if ts > cutoff_time
         ]
         
         # Check rate limit
-        current_requests = len(self.rate_limit_store[client_ip])
+        current_requests = len(self.rate_limit_store[bucket_key])
         if current_requests >= settings.rate_limiting.per_minute:
             logger.warning(
                 "Rate limit exceeded",
@@ -174,7 +185,13 @@ class SecurityMiddleware(BaseHTTPMiddleware):
             )
         
         # Record this request
-        self.rate_limit_store[client_ip].append(current_time)
+        self.rate_limit_store[bucket_key].append(current_time)
+
+        # Expose rate limit info on request for response headers
+        request.state.rate_limit_limit = settings.rate_limiting.per_minute
+        request.state.rate_limit_remaining = max(
+            0, settings.rate_limiting.per_minute - len(self.rate_limit_store[bucket_key])
+        )
     
     async def _validate_api_key(self, request: Request) -> None:
         """
@@ -199,9 +216,13 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         if api_key.startswith("Bearer "):
             api_key = api_key[7:]
         
-        # Simple validation for demo (in production, use proper key management)
-        expected_key = settings.security.api_keys.secret
-        if api_key != expected_key:
+        # Validation supporting rotation list
+        valid_keys = set(settings.security.api_keys.secrets or [])
+        # Include single secret for backward compatibility
+        if settings.security.api_keys.secret:
+            valid_keys.add(settings.security.api_keys.secret)
+        
+        if api_key not in valid_keys:
             logger.warning(
                 "Invalid API key",
                 client_ip=self._get_client_ip(request),
@@ -211,6 +232,7 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         
         # Store validated API key info in request state
         request.state.api_key_valid = True
+        request.state.api_key = api_key
     
     async def _check_security_headers(self, request: Request) -> None:
         """

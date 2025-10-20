@@ -128,8 +128,10 @@ class SearchRequest(BaseModel):
     """Vector search request schema."""
     query: str = Field(..., min_length=1, max_length=1024, description="Search query")
     collection_name: Optional[str] = Field("default", description="Collection to search")
-    limit: Optional[int] = Field(5, ge=1, le=50, description="Maximum results")
+    limit: Optional[int] = Field(5, ge=1, le=50, description="Maximum results per page")
+    offset: Optional[int] = Field(0, ge=0, description="Result offset for pagination")
     threshold: Optional[float] = Field(0.7, ge=0.0, le=1.0, description="Similarity threshold")
+    filters: Optional[Dict[str, Any]] = Field(None, description="Metadata filters")
     include_metadata: bool = Field(True, description="Include document metadata")
 
 

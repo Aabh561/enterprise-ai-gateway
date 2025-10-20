@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: enterprise-ai-gateway
+  labels:
+    app: enterprise-ai-gateway
+    version: v1
+    environment: production
+  annotations:
+    description: "Enterprise AI Gateway - Advanced AI Processing Platform"
+    contact: "devops@company.com"
