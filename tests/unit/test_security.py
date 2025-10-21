@@ -1,7 +1,7 @@
 import os
 from fastapi.testclient import TestClient
 
-os.environ.setdefault("ENVIRONMENT", "development")
+os.environ.setdefault("ENVIRONMENT", "test")
 
 from app.main import app  # noqa: E402
 

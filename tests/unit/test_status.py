@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 
 # Use default API key from settings if not provided
 DEFAULT_API_KEY = "your-super-secret-api-key-here"
-os.environ.setdefault("ENVIRONMENT", "development")
+os.environ.setdefault("ENVIRONMENT", "test")
 
 from app.main import app  # noqa: E402
 
