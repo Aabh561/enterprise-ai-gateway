@@ -1,0 +1,71 @@
+{
+  "name": "Aabharan Nrushingha Rout",
+  "tagline": "AI/ML undergrad • Generative AI • Systems-minded",
+  "location": "Chennai, India",
+  "email": "aabharan176005@gmail.com",
+  "phone": "+91-8263804174",
+  "linkedin_url": "https://www.linkedin.com/in/aabharan-rout-290958295/",
+  "github_username": "Aabh561",
+  "github_url": "https://github.com/Aabh561",
+  "resume_url": "",
+  "about": "B.Tech CSE (AI & ML) student at SRM IST (GPA: 9.5). I build privacy‑first AI agents, generative models, and production‑ready pipelines with a focus on reliability and deployment.",
+  "education": {
+    "school": "SRM Institute of Science and Technology (SRM IST)",
+    "degree": "B.Tech CSE with AI & ML",
+    "gpa": "9.5",
+    "dates": "Jan 2023 – Jun 2027",
+    "location": "Chennai, India"
+  },
+  "projects": [
+    {
+      "title": "Strategia Reader — Offline Enterprise Knowledge Agent",
+      "tags": ["LangChain", "Ollama", "Python"],
+      "dates": "Dec 2024 – Feb 2025",
+      "summary": "Privacy‑first offline Q&A agent that ingests company policies and answers without external APIs.",
+      "bullets": [
+        "FAISS retrieval + Llama‑2‑7B (Ollama) with cached embeddings (~3s responses on RTX 3060).",
+        "Prompt‑injection filtering, rate‑limiting, Docker Compose deployment, and streamlined onboarding docs.",
+        "Benchmarked vs cloud RAG tools: ~25% faster response latency with zero data leakage."
+      ],
+      "link": ""
+    },
+    {
+      "title": "Proteus — Generative AI for Protein Backbones",
+      "tags": ["Python", "DDPM Diffusion"],
+      "dates": "Feb 2025 – Jun 2025",
+      "summary": "Conditional diffusion model to generate 3D protein backbones from secondary‑structure tokens.",
+      "bullets": [
+        "Curated 2,100 non‑redundant PDB chains; trained DDPM to ~2.5 Å backbone RMSD on held‑out data.",
+        "Exported .pdb outputs; integrated FoldSeek/DSSP eval for rapid structural assessment.",
+        "Visualization with PyMOL; extended framework for antibody/protein therapeutic design."
+      ],
+      "link": ""
+    },
+    {
+      "title": "Smart Algo‑Trader — Automated Strategy Pipeline",
+      "tags": ["Python", "RSI+EMA", "Docker"],
+      "dates": "May 2024 – Jun 2024",
+      "summary": "End‑to‑end algo‑trading system: signal generation, backtesting, deployment, and monitoring.",
+      "bullets": [
+        "Backtested 2021–2023 (AAPL/MSFT/GOOGL): outperformed buy‑and‑hold by 8% with max drawdown <7%.",
+        "Automated logging (Google Sheets), Telegram alerts, GitHub Actions cron, Streamlit monitoring dashboard.",
+        "Docker‑based broker‑ready deployment with walk‑forward optimization and dynamic risk controls."
+      ],
+      "link": ""
+    }
+  ],
+  "awards": [
+    { "title": "Oracle Cloud Infrastructure — Generative AI Professional", "date": "Jun 2024" },
+    { "title": "Python for Data Science A–Z — Udemy", "date": "Jan 2025" },
+    { "title": "Hackathon Runner‑up — IIT Madras", "date": "Jan 2025" },
+    { "title": "4th Place — Techtronics Goa", "date": "Jan 2025" }
+  ],
+  "skills": {
+    "Programming": ["Python", "C++", "Bash"],
+    "AI/ML": ["PyTorch", "TensorFlow", "Scikit‑learn", "LangChain", "Hugging Face"],
+    "Generative AI": ["LLM fine‑tuning", "RAG", "Diffusion Models"],
+    "Data & Cloud": ["Pandas", "SQL", "Google Cloud", "Oracle Cloud", "Docker", "CI/CD"],
+    "Deployment": ["FastAPI", "Flask", "ONNX", "Dockerized services"],
+    "Other": ["Django", "HTML/CSS/JS", "OOP", "Software architecture"]
+  }
+}
