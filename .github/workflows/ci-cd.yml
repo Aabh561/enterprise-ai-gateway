@@ -1,6 +1,6 @@
 name: Enterprise AI Gateway CI/CD
 
-on:
+"on":
   push:
     branches: [ main, develop ]
   pull_request:
@@ -9,7 +9,7 @@ on:
 env:
   PYTHON_VERSION: '3.11'
   DOCKER_REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ toLower(github.repository) }}
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   test:
