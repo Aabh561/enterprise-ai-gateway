@@ -499,7 +499,7 @@ pytest tests/e2e/         # End-to-end tests
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+We welcome contributions! Please see our [Development Guidelines](working.md) for details.
 
 ### Development Process
 
