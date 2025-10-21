@@ -1,6 +1,6 @@
 name: Enterprise AI Gateway CI/CD
 
-"on":
+on:
   push:
     branches: [ main, develop ]
   pull_request:
