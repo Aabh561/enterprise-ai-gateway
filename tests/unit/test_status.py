@@ -1,4 +1,5 @@
 import os
+
 from fastapi.testclient import TestClient
 
 # Use default API key from settings if not provided
@@ -12,14 +13,18 @@ client = TestClient(app)
 
 def _patch_vector_service(monkeypatch):
     from app.routers import v1 as api_v1
+
     class DummyVS:
         async def health_check(self):
             return {"overall": True}
+
     async def fake_get_vector_service():
         return DummyVS()
+
     monkeypatch.setattr(api_v1, "get_vector_service", fake_get_vector_service)
     # Ensure rate limit is generous for this test module
     from app import config as cfg
+
     cfg.get_settings().rate_limiting.per_minute = 1000
 
 

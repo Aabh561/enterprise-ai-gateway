@@ -1,4 +1,5 @@
 import os
+
 from fastapi.testclient import TestClient
 
 # Ensure we run in test environment

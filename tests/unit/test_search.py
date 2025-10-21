@@ -1,4 +1,5 @@
 import os
+
 from fastapi.testclient import TestClient
 
 os.environ.setdefault("ENVIRONMENT", "test")
@@ -15,7 +16,9 @@ def test_search_pagination_and_filters(monkeypatch):
     class DummyChunk:
         def __init__(self, idx):
             self.content = f"doc {idx}"
-            self.metadata = type("M", (), {"title": f"t{idx}", "document_type": None, "file_path": None})
+            self.metadata = type(
+                "M", (), {"title": f"t{idx}", "document_type": None, "file_path": None}
+            )
             self.chunk_index = idx
 
     class DummyResult:
@@ -28,6 +31,7 @@ def test_search_pagination_and_filters(monkeypatch):
         class Svc:
             async def search(self, query, k, collection_name=None, filters=None):
                 return [DummyResult(i) for i in range(20)]
+
         return Svc()
 
     monkeypatch.setattr(api_v1, "get_vector_service", fake_get_vector_service)

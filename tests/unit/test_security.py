@@ -1,4 +1,5 @@
 import os
+
 from fastapi.testclient import TestClient
 
 os.environ.setdefault("ENVIRONMENT", "test")
@@ -10,11 +11,14 @@ client = TestClient(app)
 
 def _patch_vector_service(monkeypatch):
     from app.routers import v1 as api_v1
+
     class DummyVS:
         async def health_check(self):
             return {"overall": True}
+
     async def fake_get_vector_service():
         return DummyVS()
+
     monkeypatch.setattr(api_v1, "get_vector_service", fake_get_vector_service)
 
 
@@ -34,6 +38,7 @@ def test_rate_limit_bucket_by_api_key(monkeypatch):
     _patch_vector_service(monkeypatch)
     # Lower rate limit for test
     from app import config as cfg
+
     settings = cfg.get_settings()
     settings.rate_limiting.per_minute = 2
 
@@ -42,4 +47,7 @@ def test_rate_limit_bucket_by_api_key(monkeypatch):
     client.get("/api/v1/status", headers=headers)
     client.get("/api/v1/status", headers=headers)
     r = client.get("/api/v1/status", headers=headers)
-    assert r.status_code in (429, 401)  # If middleware short-circuits differently in tests
+    assert r.status_code in (
+        429,
+        401,
+    )  # If middleware short-circuits differently in tests
