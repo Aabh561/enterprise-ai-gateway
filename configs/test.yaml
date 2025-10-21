@@ -1,0 +1,105 @@
+app:
+  name: "Enterprise AI Gateway"
+  version: "0.1.0"
+  debug: false
+  environment: "test"
+  log_level: "ERROR"
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 1
+  reload: false
+  access_log: false
+  cors:
+    origins: 
+      - "http://localhost:3000"
+    allow_credentials: true
+
+database:
+  url: "postgresql://test:test@localhost:5432/test_db"
+  pool_size: 2
+  max_overflow: 5
+  echo: false
+
+redis:
+  url: "redis://localhost:6379/0"
+  password: null
+  db: 0
+  max_connections: 5
+  cache_ttl: 300
+
+vector_db:
+  provider: "memory"  # Use in-memory for tests
+  url: "http://localhost:8080"
+  api_key: null
+  class_name: "TestDocuments"
+  embedding:
+    model: "sentence-transformers/all-MiniLM-L6-v2"
+    batch_size: 16
+
+llm:
+  default_provider: "mock"
+  default_model: "test-model"
+  providers:
+    mock:
+      base_url: "http://localhost:11434"
+      timeout: 10
+    ollama:
+      base_url: "http://localhost:11434"
+      timeout: 10
+    openai:
+      api_key: "test-key"
+      model: "gpt-3.5-turbo"
+      timeout: 10
+    anthropic:
+      api_key: "test-key"
+      model: "claude-3-sonnet-20240229"
+      timeout: 10
+
+security:
+  api_keys:
+    enabled: true
+    secret: "your-super-secret-api-key-here"
+  jwt:
+    secret_key: "test-jwt-secret-key-very-long-and-secure"
+    algorithm: "HS256"
+    access_token_expire_minutes: 30
+  encryption:
+    key: "test-encryption-key-32-chars-long!"
+  pii_protection:
+    enabled: false  # Disable for tests
+    threshold: 0.8
+    analyzer_url: "http://localhost:5001"
+    anonymizer_url: "http://localhost:5002"
+
+plugins:
+  directory: "./plugins"
+  timeout: 10
+  max_retries: 1
+  enabled: []  # Disable plugins for tests
+
+monitoring:
+  metrics:
+    enabled: false
+    prometheus_port: 9090
+  logging:
+    audit_enabled: false
+    audit_log_path: "/tmp/audit.log"
+    structured: true
+  tracing:
+    enabled: false
+    service_name: "enterprise-ai-gateway-test"
+
+rate_limiting:
+  per_minute: 1000
+  burst: 2000
+  enabled: false  # Disable for tests
+
+file_processing:
+  max_file_size_mb: 10
+  supported_types:
+    - "pdf"
+    - "txt"
+    - "md"
+  batch_size: 2
