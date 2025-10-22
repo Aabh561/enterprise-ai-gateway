@@ -1,4 +1,5 @@
 name: Enterprise AI Gateway CI/CD
+# Updated workflow without deployment jobs
 
 on:
   push:
